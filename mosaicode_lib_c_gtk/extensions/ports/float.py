@@ -8,5 +8,9 @@ class Float(Port):
         self.hint = "FLOAT"
         self.color = "#fc2300"
         self.multiple = False
-        self.code = "$input$ = $output$;\n"
-        self.var_name = "$port[name]$$block[id]$"	
+        self.code = """
+//    realloc($output$, sizeof(*$input$));
+    $output$[$output$_size] = &$input$;
+    $output$_size++;
+"""
+        self.var_name = "$port[name]$$block[id]$"

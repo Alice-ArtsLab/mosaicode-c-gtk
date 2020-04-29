@@ -13,12 +13,17 @@ class Scale(BlockModel):
         BlockModel.__init__(self)
 
         self.language = "c"
-        self.framework = "gtk"
+        self.extension = "gtk"
         self.help = "Not to declare"
         self.label = "Scale"
         self.color = "250:150:150:150"
         self.group = "Form"
-        self.ports = []
+        self.ports = [{
+                "type":"mosaicode_lib_c_gtk.extensions.ports.float",
+                "label":"Click",
+                "conn_type":"Output",
+                "name":"click"
+                }]
 
         self.properties = [{"name": "orientation",
                             "label": "Orientation",
@@ -59,19 +64,40 @@ class Scale(BlockModel):
                            ]
 
         self.codes["declaration"] = """
-   GtkWidget *$label$_$id$;
-   GtkAdjustment *$label$_$id$_adjustment;
+GtkWidget *$label$_$id$;
+GtkAdjustment *$label$_$id$_adjustment;
+void (*$port[click]$[4]) (float value);
+int $port[click]$_size = 0;
+static void $label$$id$_value_changed_callback(GtkRange *range, gpointer user_data);
+"""
+
+        self.codes["function"] = """
+static void $label$$id$_value_changed_callback(
+                    GtkRange *range,
+                    gpointer user_data){
+    float value = gtk_range_get_value(range);
+    for(int i = 0 ; i < $port[click]$_size ; i++){
+        // Call the stored functions
+        (*($port[click]$[i]))(value);
+   }
+}
+
 """
 
         self.codes["configuration"] = """
-   $label$_$id$_adjustment = gtk_adjustment_new($prop[value]$,
+    $label$_$id$_adjustment = gtk_adjustment_new($prop[value]$,
                     $prop[lower]$,
                     $prop[upper]$,
                     $prop[step_increment]$,
                     $prop[page_increment]$,
                     $prop[page_size]$);
 
-   $label$_$id$ = gtk_scale_new($prop[orientation]$, $label$_$id$_adjustment);
-   gtk_container_add(GTK_CONTAINER(vbox), $label$_$id$);
-"""
+    $label$_$id$ = gtk_scale_new($prop[orientation]$, $label$_$id$_adjustment);
+    gtk_container_add(GTK_CONTAINER(vbox), $label$_$id$);
+    g_signal_connect(
+                G_OBJECT($label$_$id$),
+                "value-changed",
+                G_CALLBACK($label$$id$_value_changed_callback),
+                NULL);
 
+"""

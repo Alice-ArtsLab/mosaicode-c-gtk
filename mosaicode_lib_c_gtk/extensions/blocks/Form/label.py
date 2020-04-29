@@ -13,12 +13,17 @@ class Label(BlockModel):
         BlockModel.__init__(self)
 
         self.language = "c"
-        self.framework = "gtk"
+        self.extension = "gtk"
         self.help = "Not to declare"
         self.label = "Label"
         self.color = "250:150:150:150"
         self.group = "Form"
-        self.ports = []
+        self.ports = [{
+                "type": "mosaicode_lib_c_gtk.extensions.ports.float",
+                "name": "float_value",
+                "conn_type": "Input",
+                "label": "Float Value"
+                }]
 
         self.properties = [{"name": "label",
                             "label": "Label",
@@ -27,11 +32,18 @@ class Label(BlockModel):
                             }
                            ]
 
-        self.codes["function"] = """
+        self.codes["declaration"] = """
+GtkWidget *$label$_$id$;
+void $port[float_value]$(float value);
 """
 
-        self.codes["declaration"] = """
-   GtkWidget *$label$_$id$;
+        self.codes["function"] = """
+void $port[float_value]$(float value){
+    gchar *display;
+    display = g_strdup_printf("$prop[label]$: %.1f", value);
+    gtk_label_set_text(GTK_LABEL($label$_$id$), display);
+    g_free(display);
+}
 """
 
         self.codes["configuration"] = """
