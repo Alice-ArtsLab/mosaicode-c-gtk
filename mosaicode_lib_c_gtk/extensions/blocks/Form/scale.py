@@ -63,10 +63,14 @@ class Scale(BlockModel):
                             }
                            ]
 
+        self.codes["function_declaration"] = """
+typedef void (*float_callback)(float value);
+"""
+
         self.codes["declaration"] = """
 GtkWidget *$label$_$id$;
 GtkAdjustment *$label$_$id$_adjustment;
-void (*$port[click]$[4]) (float value);
+float_callback * $port[click]$ = (float_callback *)malloc(sizeof(float_callback));
 int $port[click]$_size = 0;
 static void $label$$id$_value_changed_callback(GtkRange *range, gpointer user_data);
 """

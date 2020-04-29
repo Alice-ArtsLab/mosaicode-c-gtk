@@ -7,9 +7,9 @@ class Float(Port):
         self.language = "c"
         self.hint = "FLOAT"
         self.color = "#fc2300"
-        self.multiple = False
+        self.multiple = True
         self.code = """
-//    realloc($output$, sizeof(*$input$));
+    $output$ = (float_callback *) realloc($output$, ($output$_size + 1 ) * sizeof(float_callback));
     $output$[$output$_size] = &$input$;
     $output$_size++;
 """

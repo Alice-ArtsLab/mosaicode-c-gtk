@@ -20,7 +20,7 @@ class CFile(CodeTemplate):
         self.description = "A full template to generate gtk code"
         self.command = "g++ -o $dir_name$main $dir_name$main.c `pkg-config --cflags --libs gtk+-3.0`\n"
         self.command += "$dir_name$./main"
-        self.code_parts = ["declaration", "function", "configuration"]
+        self.code_parts = ["declaration", "function_declaration", "function", "configuration"]
         self.properties = [{"name": "title",
                             "label": "Title",
                             "value": "Title",
@@ -38,8 +38,13 @@ class CFile(CodeTemplate):
                             }
                            ]
 
+        self.files["main.h"] = r"""
+$single_code[function_declaration]$
+"""
+
         self.files["main.c"] = r"""
 #include <gtk/gtk.h>
+#include "main.h"
 
 void destroy(void){
    gtk_main_quit ();
