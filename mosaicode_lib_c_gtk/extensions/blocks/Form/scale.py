@@ -19,7 +19,7 @@ class Scale(BlockModel):
         self.color = "250:150:150:150"
         self.group = "Form"
         self.ports = [{
-                "type":"mosaicode_lib_c_gtk.extensions.ports.float",
+                "type":"mosaicode_lib_c_base.extensions.ports.float",
                 "label":"Click",
                 "conn_type":"Output",
                 "name":"click"
