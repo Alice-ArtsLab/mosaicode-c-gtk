@@ -19,7 +19,7 @@ class Label(BlockModel):
         self.color = "250:150:150:150"
         self.group = "Form"
         self.ports = [{
-                "type":"mosaicode_lib_c_base.extensions.ports.float",
+                "type": "mosaicode_lib_c_base.extensions.ports.float",
                 "name": "float_value",
                 "conn_type": "Input",
                 "label": "Float Value"

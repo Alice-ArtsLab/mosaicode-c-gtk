@@ -10,7 +10,7 @@ except ImportError:
     from distutils.core import setup
 
 setup(name='mosaicode-lib-c-gtk',
-    install_requires=['mosaicode'],
+    #install_requires=['mosaicode'],
     python_requires='>=2.7',
     tests_require=[],
     test_suite='',
