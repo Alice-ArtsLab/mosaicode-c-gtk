@@ -19,7 +19,7 @@ class Label(BlockModel):
         self.color = "250:150:150:150"
         self.group = "Form"
         self.ports = [{
-                "type": "mosaicode_lib_c_gtk.extensions.ports.float",
+                "type":"mosaicode_lib_c_base.extensions.ports.float",
                 "name": "float_value",
                 "conn_type": "Input",
                 "label": "Float Value"
@@ -34,10 +34,7 @@ class Label(BlockModel):
 
         self.codes["declaration"] = """
 GtkWidget *$label$_$id$;
-void $port[float_value]$(float value);
-"""
 
-        self.codes["function"] = """
 void $port[float_value]$(float value){
     gchar *display;
     display = g_strdup_printf("$prop[label]$: %.1f", value);
@@ -46,7 +43,7 @@ void $port[float_value]$(float value){
 }
 """
 
-        self.codes["configuration"] = """
+        self.codes["setup"] = """
    $label$_$id$ = gtk_label_new("$prop[label]$");
    gtk_container_add(GTK_CONTAINER(vbox), $label$_$id$);
 """

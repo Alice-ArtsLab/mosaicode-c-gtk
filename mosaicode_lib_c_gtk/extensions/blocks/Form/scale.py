@@ -19,7 +19,7 @@ class Scale(BlockModel):
         self.color = "250:150:150:150"
         self.group = "Form"
         self.ports = [{
-                "type":"mosaicode_lib_c_gtk.extensions.ports.float",
+                "type":"mosaicode_lib_c_base.extensions.ports.float",
                 "label":"Click",
                 "conn_type":"Output",
                 "name":"click"
@@ -63,19 +63,13 @@ class Scale(BlockModel):
                             }
                            ]
 
-        self.codes["function_declaration"] = """
-typedef void (*float_callback)(float value);
-"""
-
         self.codes["declaration"] = """
 GtkWidget *$label$_$id$;
 GtkAdjustment *$label$_$id$_adjustment;
-float_callback * $port[click]$ = (float_callback *)malloc(sizeof(float_callback));
+typedef void (*scale_callback_$id$)(float value);
+scale_callback_$id$ * $port[click]$;
 int $port[click]$_size = 0;
-static void $label$$id$_value_changed_callback(GtkRange *range, gpointer user_data);
-"""
 
-        self.codes["function"] = """
 static void $label$$id$_value_changed_callback(
                     GtkRange *range,
                     gpointer user_data){
@@ -88,7 +82,7 @@ static void $label$$id$_value_changed_callback(
 
 """
 
-        self.codes["configuration"] = """
+        self.codes["setup"] = """
     $label$_$id$_adjustment = gtk_adjustment_new($prop[value]$,
                     $prop[lower]$,
                     $prop[upper]$,
@@ -97,6 +91,7 @@ static void $label$$id$_value_changed_callback(
                     $prop[page_size]$);
 
     $label$_$id$ = gtk_scale_new($prop[orientation]$, $label$_$id$_adjustment);
+    $port[click]$ = (scale_callback_$id$ *)malloc(sizeof(scale_callback_$id$));
     gtk_container_add(GTK_CONTAINER(vbox), $label$_$id$);
     g_signal_connect(
                 G_OBJECT($label$_$id$),

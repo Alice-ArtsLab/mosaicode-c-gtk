@@ -18,9 +18,8 @@ class CFile(CodeTemplate):
         self.name = "gtk"
         self.language = "c"
         self.description = "A full template to generate gtk code"
-        self.command = "g++ -o $dir_name$main $dir_name$main.c `pkg-config --cflags --libs gtk+-3.0`\n"
-        self.command += "$dir_name$./main"
-        self.code_parts = ["declaration", "function_declaration", "function", "configuration"]
+        self.command = "make && $dir_name$./main\n"
+        self.code_parts = ["declaration", "setup"]
         self.properties = [{"name": "title",
                             "label": "Title",
                             "value": "Title",
@@ -38,27 +37,19 @@ class CFile(CodeTemplate):
                             }
                            ]
 
-        self.files["main.h"] = r"""
-$single_code[function_declaration]$
-"""
-
         self.files["main.c"] = r"""
 #include <gtk/gtk.h>
-#include "main.h"
+
+GtkWidget *window;
+GtkWidget *vbox;
+$code[declaration]$
 
 void destroy(void){
    gtk_main_quit ();
 }
-$code[declaration]$
-
-$code[function]$
 
 int main(int argc, char *argv[]){
-   GtkWidget *window;
-   GtkWidget *vbox;
-
    gtk_init(&argc, &argv);
-
 
    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    gtk_window_set_title(GTK_WINDOW(window), "$prop[title]$");
@@ -68,7 +59,7 @@ int main(int argc, char *argv[]){
    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL,3);
    gtk_container_add(GTK_CONTAINER(window), vbox);
 
-   $code[configuration]$
+   $code[setup]$
    $connections$
 
    gtk_widget_show_all(window);
@@ -76,5 +67,23 @@ int main(int argc, char *argv[]){
    return 0;
 }
 """
+
+        self.files["Makefile"] = \
+r"""CC := gcc
+CFLAGS := -g -Wall
+LIBS := `pkg-config --cflags --libs gtk+-3.0`
+LIB_FLAGS := 
+TARGET := main
+
+all:	$(TARGET)
+
+main: main.o
+	$(CC) $(CFLAGS) $^ $(LIB_FLAGS) -o $@  $(LIBS)
+
+main.o: main.c
+	$(CC) $(CFLAGS) -c $< $(LIB_FLAGS) -o $@  $(LIBS)
+
+"""
+
 
 # -------------------------------------------------------------------------

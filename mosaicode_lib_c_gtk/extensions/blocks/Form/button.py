@@ -19,7 +19,7 @@ class Button(BlockModel):
         self.color = "250:150:150:150"
         self.group = "Form"
         self.ports = [{
-                "type":"mosaicode_lib_c_gtk.extensions.ports.float",
+                "type":"mosaicode_lib_c_base.extensions.ports.float",
                 "label":"Click",
                 "conn_type":"Output",
                 "name":"click"
@@ -40,18 +40,12 @@ class Button(BlockModel):
                             }
                            ]
 
-        self.codes["function_declaration"] = """
-typedef void (*float_callback)(float value);
-"""
-
         self.codes["declaration"] = """
 GtkWidget *$label$_$id$;
-float_callback * $port[click]$ = (float_callback *)malloc(sizeof(float_callback));
+typedef void (*button_callback_$id$)(float value);
+button_callback_$id$ * $port[click]$;
 int $port[click]$_size = 0;
-void $label$$id$_callback(void * data);
-"""
 
-        self.codes["function"] = """
 void $label$$id$_callback(void * data){
    for(int i = 0 ; i < $port[click]$_size ; i++){
         // Call the stored functions
@@ -60,8 +54,9 @@ void $label$$id$_callback(void * data){
 }
 """
 
-        self.codes["configuration"] = """
+        self.codes["setup"] = """
     $label$_$id$ = gtk_button_new_with_label("$prop[label]$");
+    $port[click]$ = (button_callback_$id$ *)malloc(sizeof(button_callback_$id$));
     g_signal_connect(
                 G_OBJECT($label$_$id$),
                 "clicked",
