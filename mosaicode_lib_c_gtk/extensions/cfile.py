@@ -39,6 +39,10 @@ class CFile(CodeTemplate):
 
         self.files["main.c"] = r"""
 #include <gtk/gtk.h>
+#include <limits.h>
+#include <string.h>
+#include <time.h>
+#include <math.h>
 
 GtkWidget *window;
 GtkWidget *vbox;
@@ -49,6 +53,11 @@ void destroy(void){
 }
 
 int main(int argc, char *argv[]){
+   time_t t;
+
+   /* Intializes random number generator */
+   srand((unsigned) time(&t));
+
    gtk_init(&argc, &argv);
 
    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -71,8 +80,8 @@ int main(int argc, char *argv[]){
         self.files["Makefile"] = \
 r"""CC := gcc
 CFLAGS := -g -Wall
-LIBS := `pkg-config --cflags --libs gtk+-3.0`
-LIB_FLAGS := 
+LIBS := -lm `pkg-config --cflags --libs gtk+-3.0`
+LIB_FLAGS :=
 TARGET := main
 
 all:	$(TARGET)
