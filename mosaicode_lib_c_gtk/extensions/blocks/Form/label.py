@@ -14,7 +14,6 @@ class Label(BlockModel):
 
         self.language = "c"
         self.extension = "gtk"
-        self.help = "Not to declare"
         self.label = "Label"
         self.color = "250:150:150:150"
         self.group = "Form"
