@@ -48,7 +48,7 @@ typedef void (*switch_callback_$id$)(float value);
 switch_callback_$id$ * $port[click]$;
 int $port[click]$_size = 0;
 
-void switch$id$_callback(GtkSwitch *toggle_button, gboolean state, void * data){
+void switch$id$_callback(GtkSwitch *widget, gboolean state, void * data){
     float result = 0;
     if (state){
         result = $prop[value_on]$;
