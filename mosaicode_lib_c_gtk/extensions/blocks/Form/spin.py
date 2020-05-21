@@ -32,25 +32,25 @@ class Spin(BlockModel):
                             "step": 1,
                             "value": 1
                             },
-                            {"name": "lower",
-                            "label": "Lower",
+                            {"name": "min",
+                            "label": "Min",
                             "type": MOSAICODE_FLOAT,
                             "lower": -20000,
                             "upper": 20000,
                             "step": 1,
                             "value": 0
                             },
-                            {"name": "upper",
-                            "label": "Upper",
+                            {"name": "max",
+                            "label": "Max",
                             "type": MOSAICODE_FLOAT,
                             "lower": -20000,
                             "upper": 20000,
                             "step": 1,
                             "value": 200000
                             },
-                            {"name": "climb_rate",
-                            "label": "Climb Rate",
-                            "type": MOSAICODE_INT,
+                            {"name": "step",
+                            "label": "Step",
+                            "type": MOSAICODE_FLOAT,
                             "lower": 0,
                             "upper": 20000,
                             "step": 1,
@@ -68,7 +68,6 @@ class Spin(BlockModel):
 
         self.codes["declaration"] = """
 GtkWidget *spin_$id$;
-GtkAdjustment *spin_$id$_adjustment;
 typedef void (*spin_callback_$id$)(float value);
 spin_callback_$id$ * $port[click]$;
 int $port[click]$_size = 0;
@@ -82,17 +81,12 @@ void spin$id$_callback(GtkSpinButton *widget, gboolean state, void * data){
 """
 
         self.codes["setup"] = """
-    spin_$id$_adjustment = gtk_adjustment_new (
-                $prop[lower]$,
-                0.0, // page increment
-                10.0, // page size
-                1.0, //step icnrement
-                $prop[upper]$,
-                $prop[value]$);
-    spin_$id$ = gtk_spin_button_new(
-                spin_$id$_adjustment,
-                $prop[climb_rate]$,
-                $prop[digits]$);
+    spin_$id$ = gtk_spin_button_new_with_range(
+                $prop[min]$,
+                $prop[max]$,
+                $prop[step]$);
+    gtk_spin_button_set_digits(GTK_SPIN_BUTTON(spin_$id$), $prop[digits]$);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spin_$id$), $prop[value]$);
     $port[click]$ = (spin_callback_$id$ *)malloc(sizeof(spin_callback_$id$));
     g_signal_connect(
                 G_OBJECT(spin_$id$),
