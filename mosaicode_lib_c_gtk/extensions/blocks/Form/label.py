@@ -17,14 +17,31 @@ class Label(BlockModel):
         self.label = "Label"
         self.color = "250:150:150:150"
         self.group = "Form"
-        self.ports = [{
+        self.ports = [
+                {
                 "type": "mosaicode_lib_c_base.extensions.ports.float",
                 "name": "float_value",
                 "conn_type": "Input",
                 "label": "Float Value"
+                },
+                {
+                "type": "mosaicode_lib_c_base.extensions.ports.string",
+                "name": "string_value",
+                "conn_type": "Input",
+                "label": "String Value"
                 }]
 
-        self.properties = [{"name": "label",
+        self.properties = [{"name": "x",
+                            "label": "X",
+                            "type": MOSAICODE_INT,
+                            "value": "0"
+                            },
+                            {"name": "y",
+                            "label": "Y",
+                            "type": MOSAICODE_INT,
+                            "value": "0"
+                            },
+                            {"name": "label",
                             "label": "Label",
                             "type": MOSAICODE_STRING,
                             "value": "Label"
@@ -32,18 +49,26 @@ class Label(BlockModel):
                            ]
 
         self.codes["declaration"] = """
-GtkWidget *$label$_$id$;
+GtkWidget * label_$id$;
 
 void $port[float_value]$(float value){
     gchar *display;
     display = g_strdup_printf("$prop[label]$: %.1f", value);
-    gtk_label_set_text(GTK_LABEL($label$_$id$), display);
+    gtk_label_set_text(GTK_LABEL(label_$id$), display);
     g_free(display);
 }
+
+void $port[string_value]$(const char * value){
+    gchar *display;
+    display = g_strdup_printf("$prop[label]$: %s", value);
+    gtk_label_set_text(GTK_LABEL(label_$id$), display);
+    g_free(display);
+}
+
 """
 
         self.codes["setup"] = """
-   $label$_$id$ = gtk_label_new("$prop[label]$");
-   gtk_container_add(GTK_CONTAINER(vbox), $label$_$id$);
+   label_$id$ = gtk_label_new("$prop[label]$");
+   gtk_fixed_put(GTK_FIXED(fixed_layout), label_$id$, $prop[x]$, $prop[y]$);
 """
 

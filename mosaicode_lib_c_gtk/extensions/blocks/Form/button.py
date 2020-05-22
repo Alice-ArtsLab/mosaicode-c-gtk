@@ -24,7 +24,17 @@ class Button(BlockModel):
                 "name":"click"
                 }]
 
-        self.properties = [{"name": "value",
+        self.properties = [{"name": "x",
+                            "label": "X",
+                            "type": MOSAICODE_INT,
+                            "value": "0"
+                            },
+                            {"name": "y",
+                            "label": "Y",
+                            "type": MOSAICODE_INT,
+                            "value": "0"
+                            },
+                            {"name": "value",
                             "label": "Value",
                             "type": MOSAICODE_FLOAT,
                             "lower": 0,
@@ -40,12 +50,11 @@ class Button(BlockModel):
                            ]
 
         self.codes["declaration"] = """
-GtkWidget *$label$_$id$;
-typedef void (*button_callback_$id$)(float value);
-button_callback_$id$ * $port[click]$;
+GtkWidget *button_$id$;
+float_callback * $port[click]$;
 int $port[click]$_size = 0;
 
-void $label$$id$_callback(void * data){
+void button$id$_callback(void * data){
    for(int i = 0 ; i < $port[click]$_size ; i++){
         // Call the stored functions
         (*($port[click]$[i]))($prop[value]$);
@@ -54,13 +63,12 @@ void $label$$id$_callback(void * data){
 """
 
         self.codes["setup"] = """
-    $label$_$id$ = gtk_button_new_with_label("$prop[label]$");
-    $port[click]$ = (button_callback_$id$ *)malloc(sizeof(button_callback_$id$));
+    button_$id$ = gtk_button_new_with_label("$prop[label]$");
     g_signal_connect(
-                G_OBJECT($label$_$id$),
+                G_OBJECT(button_$id$),
                 "clicked",
-                G_CALLBACK($label$$id$_callback),
+                G_CALLBACK(button$id$_callback),
                 NULL
                 );
-    gtk_container_add(GTK_CONTAINER(vbox), $label$_$id$);
+    gtk_fixed_put(GTK_FIXED(fixed_layout), button_$id$, $prop[x]$, $prop[y]$);
 """

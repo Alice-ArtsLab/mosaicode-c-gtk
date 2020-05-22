@@ -41,12 +41,9 @@ class MouseRelease(BlockModel):
         self.properties = []
 
         self.codes["declaration"] = """
-typedef void (*button_callback_release_x_$id$)(float value);
-typedef void (*button_callback_release_y_$id$)(float value);
-typedef void (*button_callback_release_button_$id$)(float value);
-button_callback_release_x_$id$ * $port[release_x]$;
-button_callback_release_y_$id$ * $port[release_y]$;
-button_callback_release_button_$id$ * $port[release_button]$;
+float_callback * $port[release_x]$;
+float_callback * $port[release_y]$;
+float_callback * $port[release_button]$;
 int $port[release_x]$_size = 0;
 int $port[release_y]$_size = 0;
 int $port[release_button]$_size = 0;
@@ -71,9 +68,6 @@ void mouse_release_$id$_callback_release(
 """
 
         self.codes["setup"] = """
-    $port[release_x]$ = (button_callback_release_x_$id$ *)malloc(sizeof(button_callback_release_x_$id$));
-    $port[release_y]$ = (button_callback_release_y_$id$ *)malloc(sizeof(button_callback_release_y_$id$));
-    $port[release_button]$ = (button_callback_release_button_$id$ *)malloc(sizeof(button_callback_release_button_$id$));
     g_signal_connect(
                 G_OBJECT(window),
                 "button_release_event",

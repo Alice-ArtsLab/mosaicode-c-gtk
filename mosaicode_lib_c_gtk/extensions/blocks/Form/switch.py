@@ -17,14 +17,30 @@ class Switch(BlockModel):
         self.label = "Switch"
         self.color = "250:150:150:150"
         self.group = "Form"
-        self.ports = [{
+        self.ports = [
+                {
+                "type": "mosaicode_lib_c_base.extensions.ports.float",
+                "name": "float_value",
+                "conn_type": "Input",
+                "label": "Float Value"
+                },{
                 "type":"mosaicode_lib_c_base.extensions.ports.float",
                 "label":"Click",
                 "conn_type":"Output",
                 "name":"click"
                 }]
 
-        self.properties = [{"name": "value_on",
+        self.properties = [{"name": "x",
+                            "label": "X",
+                            "type": MOSAICODE_INT,
+                            "value": "0"
+                            },
+                            {"name": "y",
+                            "label": "Y",
+                            "type": MOSAICODE_INT,
+                            "value": "0"
+                            },
+                            {"name": "value_on",
                             "label": "Value On",
                             "type": MOSAICODE_FLOAT,
                             "lower": 0,
@@ -43,10 +59,16 @@ class Switch(BlockModel):
                            ]
 
         self.codes["declaration"] = """
-GtkWidget *switch_$id$;
-typedef void (*switch_callback_$id$)(float value);
-switch_callback_$id$ * $port[click]$;
+GtkWidget * switch_$id$;
+float_callback * $port[click]$;
 int $port[click]$_size = 0;
+
+void $port[float_value]$(float value){
+    if (value == 0)
+        gtk_switch_set_state(GTK_SWITCH(switch_$id$), FALSE);
+    else
+        gtk_switch_set_state(GTK_SWITCH(switch_$id$), TRUE);
+}
 
 void switch$id$_callback(GtkSwitch *widget, gboolean state, void * data){
     float result = 0;
@@ -63,12 +85,11 @@ void switch$id$_callback(GtkSwitch *widget, gboolean state, void * data){
 
         self.codes["setup"] = """
     switch_$id$ = gtk_switch_new();
-    $port[click]$ = (switch_callback_$id$ *)malloc(sizeof(switch_callback_$id$));
     g_signal_connect(
                 G_OBJECT(switch_$id$),
                 "state-set",
                 G_CALLBACK(switch$id$_callback),
                 NULL
                 );
-    gtk_container_add(GTK_CONTAINER(vbox), switch_$id$);
+    gtk_fixed_put(GTK_FIXED(fixed_layout), switch_$id$, $prop[x]$, $prop[y]$);
 """

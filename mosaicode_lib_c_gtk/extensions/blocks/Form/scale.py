@@ -17,14 +17,30 @@ class Scale(BlockModel):
         self.label = "Scale"
         self.color = "250:150:150:150"
         self.group = "Form"
-        self.ports = [{
+        self.ports = [
+                {
+                "type": "mosaicode_lib_c_base.extensions.ports.float",
+                "name": "float_value",
+                "conn_type": "Input",
+                "label": "Float Value"
+                },{
                 "type":"mosaicode_lib_c_base.extensions.ports.float",
                 "label":"Click",
                 "conn_type":"Output",
                 "name":"click"
                 }]
 
-        self.properties = [{"name": "orientation",
+        self.properties = [{"name": "x",
+                            "label": "X",
+                            "type": MOSAICODE_INT,
+                            "value": "0"
+                            },
+                            {"name": "y",
+                            "label": "Y",
+                            "type": MOSAICODE_INT,
+                            "value": "0"
+                            },
+                            {"name": "orientation",
                             "label": "Orientation",
                             "type": MOSAICODE_COMBO,
                             "values": ["GTK_ORIENTATION_HORIZONTAL","GTK_ORIENTATION_VERTICAL"],
@@ -35,41 +51,38 @@ class Scale(BlockModel):
                             "type": MOSAICODE_FLOAT,
                             "value": "0"
                             },
-                            {"name": "lower",
-                            "label": "Lower",
+                            {"name": "min",
+                            "label": "Min",
                             "type": MOSAICODE_FLOAT,
                             "value": "0"
                             },
-                            {"name": "upper",
-                            "label": "Upper",
+                            {"name": "max",
+                            "label": "Max",
                             "type": MOSAICODE_FLOAT,
                             "value": "100"
                             },
-                            {"name": "step_increment",
-                            "label": "Step Increment",
+                            {"name": "step",
+                            "label": "Step",
                             "type": MOSAICODE_FLOAT,
                             "value": "1"
                             },
-                            {"name": "page_increment",
-                            "label": "Page Increment",
+                            {"name": "digits",
+                            "label": "Digits",
                             "type": MOSAICODE_FLOAT,
-                            "value": "10"
-                            },
-                            {"name": "page_size",
-                            "label": "Page size",
-                            "type": MOSAICODE_FLOAT,
-                            "value": "10"
+                            "value": "2"
                             }
                            ]
 
         self.codes["declaration"] = """
-GtkWidget *$label$_$id$;
-GtkAdjustment *$label$_$id$_adjustment;
-typedef void (*scale_callback_$id$)(float value);
-scale_callback_$id$ * $port[click]$;
+GtkWidget * scale_$id$;
+float_callback * $port[click]$;
 int $port[click]$_size = 0;
 
-static void $label$$id$_value_changed_callback(
+void $port[float_value]$(float value){
+    gtk_range_set_value(GTK_RANGE(scale_$id$), value);
+}
+
+static void scale$id$_value_changed_callback(
                     GtkRange *range,
                     gpointer user_data){
     float value = gtk_range_get_value(range);
@@ -82,20 +95,18 @@ static void $label$$id$_value_changed_callback(
 """
 
         self.codes["setup"] = """
-    $label$_$id$_adjustment = gtk_adjustment_new($prop[value]$,
-                    $prop[lower]$,
-                    $prop[upper]$,
-                    $prop[step_increment]$,
-                    $prop[page_increment]$,
-                    $prop[page_size]$);
-
-    $label$_$id$ = gtk_scale_new($prop[orientation]$, $label$_$id$_adjustment);
-    $port[click]$ = (scale_callback_$id$ *)malloc(sizeof(scale_callback_$id$));
-    gtk_container_add(GTK_CONTAINER(vbox), $label$_$id$);
+    scale_$id$ = gtk_scale_new_with_range(
+                $prop[orientation]$,
+                $prop[min]$,
+                $prop[max]$,
+                $prop[step]$
+                );
+    gtk_range_set_value(GTK_RANGE(scale_$id$), $prop[value]$);
+    gtk_scale_set_digits(GTK_SCALE(scale_$id$), $prop[digits]$);
     g_signal_connect(
-                G_OBJECT($label$_$id$),
+                G_OBJECT(scale_$id$),
                 "value-changed",
-                G_CALLBACK($label$$id$_value_changed_callback),
+                G_CALLBACK(scale$id$_value_changed_callback),
                 NULL);
-
+    gtk_fixed_put(GTK_FIXED(fixed_layout), scale_$id$, $prop[x]$, $prop[y]$);
 """

@@ -35,10 +35,8 @@ class MouseMove(BlockModel):
         self.properties = []
 
         self.codes["declaration"] = """
-typedef void (*button_callback_move_x_$id$)(float value);
-typedef void (*button_callback_move_y_$id$)(float value);
-button_callback_move_x_$id$ * $port[move_x]$;
-button_callback_move_y_$id$ * $port[move_y]$;
+float_callback * $port[move_x]$;
+float_callback * $port[move_y]$;
 int $port[move_x]$_size = 0;
 int $port[move_y]$_size = 0;
 
@@ -58,8 +56,6 @@ void mouse_move_$id$_callback_move(
 """
 
         self.codes["setup"] = """
-    $port[move_x]$ = (button_callback_move_x_$id$ *)malloc(sizeof(button_callback_move_x_$id$));
-    $port[move_y]$ = (button_callback_move_y_$id$ *)malloc(sizeof(button_callback_move_y_$id$));
     g_signal_connect(
                 G_OBJECT(window),
                 "motion_notify_event",

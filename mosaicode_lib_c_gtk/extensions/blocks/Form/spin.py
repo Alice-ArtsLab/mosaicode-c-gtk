@@ -17,14 +17,30 @@ class Spin(BlockModel):
         self.label = "Spin"
         self.color = "250:150:150:150"
         self.group = "Form"
-        self.ports = [{
+        self.ports = [
+                {
+                "type": "mosaicode_lib_c_base.extensions.ports.float",
+                "name": "float_value",
+                "conn_type": "Input",
+                "label": "Float Value"
+                },{
                 "type":"mosaicode_lib_c_base.extensions.ports.float",
                 "label":"Click",
                 "conn_type":"Output",
                 "name":"click"
                 }]
 
-        self.properties = [{"name": "value",
+        self.properties = [{"name": "x",
+                            "label": "X",
+                            "type": MOSAICODE_INT,
+                            "value": "0"
+                            },
+                            {"name": "y",
+                            "label": "Y",
+                            "type": MOSAICODE_INT,
+                            "value": "0"
+                            },
+                            {"name": "value",
                             "label": "Value",
                             "type": MOSAICODE_FLOAT,
                             "lower": 0,
@@ -68,9 +84,12 @@ class Spin(BlockModel):
 
         self.codes["declaration"] = """
 GtkWidget *spin_$id$;
-typedef void (*spin_callback_$id$)(float value);
-spin_callback_$id$ * $port[click]$;
+float_callback * $port[click]$;
 int $port[click]$_size = 0;
+
+void $port[float_value]$(float value){
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spin_$id$), value);
+}
 
 void spin$id$_callback(GtkSpinButton *widget, gboolean state, void * data){
     float result = (float)gtk_spin_button_get_value(widget);
@@ -87,12 +106,11 @@ void spin$id$_callback(GtkSpinButton *widget, gboolean state, void * data){
                 $prop[step]$);
     gtk_spin_button_set_digits(GTK_SPIN_BUTTON(spin_$id$), $prop[digits]$);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(spin_$id$), $prop[value]$);
-    $port[click]$ = (spin_callback_$id$ *)malloc(sizeof(spin_callback_$id$));
     g_signal_connect(
                 G_OBJECT(spin_$id$),
                 "value-changed",
                 G_CALLBACK(spin$id$_callback),
                 NULL
                 );
-    gtk_container_add(GTK_CONTAINER(vbox), spin_$id$);
+    gtk_fixed_put(GTK_FIXED(fixed_layout), spin_$id$, $prop[x]$, $prop[y]$);
 """
